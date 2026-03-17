@@ -24,6 +24,7 @@ function getCreatureDescription(card) {
     if (isDog(card)) {
         return 'Собака';
     }
+
     return 'Существо';
 }
 
@@ -70,7 +71,50 @@ class Trasher extends Dog {
         continuation(reducedDamage);
     }
     getDescriptions() {
-        return [...super.getDescriptions(), "Способность: уменьшает урон на 1"];
+        return ["Способность: уменьшает урон на 1", ...super.getDescriptions()];
+    }
+}
+class Lad extends Dog {
+    constructor() {
+        super("Браток", 2);
+    }
+    static getInGameCount() { return this.inGameCount || 0; }
+    static setInGameCount(value) { this.inGameCount = value; }
+    static getBonus() {
+        const count = this.getInGameCount();
+        return count * (count + 1) / 2;
+    }
+    doAfterComingIntoPlay() {
+        const currentCount = Lad.getInGameCount();
+        Lad.setInGameCount(currentCount + 1);
+        super.doAfterComingIntoPlay?.();
+    }
+
+    doBeforeRemoving() {
+        const currentCount = Lad.getInGameCount();
+        Lad.setInGameCount(Math.max(0, currentCount - 1));
+        super.doBeforeRemoving?.();
+    }
+    modifyDealedDamageToCreature(damage, target) {
+        const bonus = Lad.getBonus();
+        return damage + bonus;
+    }
+
+    modifyTakenDamage(damage, from) {
+        const bonus = Lad.getBonus();
+        return Math.max(0, damage - bonus);
+    }
+    getDescriptions() {
+        const hasModifyDealed = Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature');
+        const hasModifyTaken = Lad.prototype.hasOwnProperty('modifyTakenDamage');
+
+        let descriptions = [...super.getDescriptions()];
+
+        if (hasModifyDealed || hasModifyTaken) {
+            descriptions.push("Чем их больше, тем они сильнее");
+        }
+
+        return descriptions;
     }
 }
 // Колода Шерифа, нижнего игрока.
@@ -82,7 +126,8 @@ const seriffStartDeck = [
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Trasher(),
+    new Lad(),
+    new Lad(),
 ];
 
 
