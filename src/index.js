@@ -83,31 +83,39 @@ class Lad extends Dog {
         const count = this.getInGameCount();
         return count * (count + 1) / 2;
     }
-    doAfterComingIntoPlay() {
+    doAfterComingIntoPlay(gameContext, continuation) {
         const currentCount = Lad.getInGameCount();
         Lad.setInGameCount(currentCount + 1);
-        super.doAfterComingIntoPlay?.();
+        if (super.doAfterComingIntoPlay) {
+            super.doAfterComingIntoPlay(gameContext, continuation);
+        } else {
+            continuation();
+        }
     }
 
-    doBeforeRemoving() {
+    doBeforeRemoving(continuation) {
         const currentCount = Lad.getInGameCount();
         Lad.setInGameCount(Math.max(0, currentCount - 1));
-        super.doBeforeRemoving?.();
+        if (super.doBeforeRemoving) {
+            super.doBeforeRemoving(continuation);
+        } else {
+            continuation();
+        }
     }
-    modifyDealedDamageToCreature(damage, target) {
+    modifyDealedDamageToCreature(value, toCard, gameContext, continuation) {
         const bonus = Lad.getBonus();
-        return damage + bonus;
+        continuation(value + bonus);
     }
 
-    modifyTakenDamage(damage, from) {
+    modifyTakenDamage(value, fromCard, gameContext, continuation) {
         const bonus = Lad.getBonus();
-        return Math.max(0, damage - bonus);
+        continuation(Math.max(0, value - bonus));
     }
     getDescriptions() {
-        const hasModifyDealed = Lad.prototype.hasOwnProperty('modifyDealedDamageToCreature');
-        const hasModifyTaken = Lad.prototype.hasOwnProperty('modifyTakenDamage');
+        const hasModifyDealed = this.modifyDealedDamageToCreature !== Card.prototype.modifyDealedDamageToCreature;
+        const hasModifyTaken = this.modifyTakenDamage !== Card.prototype.modifyTakenDamage;
 
-        let descriptions = [...super.getDescriptions()];
+        let descriptions = super.getDescriptions();
 
         if (hasModifyDealed || hasModifyTaken) {
             descriptions.push("Чем их больше, тем они сильнее");
@@ -150,7 +158,8 @@ const seriffStartDeck = [
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Trasher(),
+    new Lad(),
+    new Lad(),
 ];
 
 
