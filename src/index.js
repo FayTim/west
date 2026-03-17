@@ -24,7 +24,6 @@ function getCreatureDescription(card) {
     if (isDog(card)) {
         return 'Собака';
     }
-
     return 'Существо';
 }
 
@@ -117,6 +116,31 @@ class Lad extends Dog {
         return descriptions;
     }
 }
+
+class Gatling extends Creature {
+    constructor() {
+        super("Гатлинг", 6);
+    }
+    attack(gameContext, continuation) {
+        const taskQueue = new TaskQueue();
+
+        const {oppositePlayer} = gameContext;
+
+        taskQueue.push(onDone => this.view.showAttack(onDone));
+        for (let oppositeCard of oppositePlayer.table) {
+            if (oppositeCard) {
+                taskQueue.push(onDone => {
+                    this.dealDamageToCreature(2, oppositeCard, gameContext, onDone);
+                });
+            }
+        }
+        taskQueue.continueWith(continuation);
+    }
+    getDescriptions() {
+        return [...super.getDescriptions(), "Способность: При атаке наносит урон на 2 весм картам противника"];
+    }
+}
+
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
@@ -126,8 +150,7 @@ const seriffStartDeck = [
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Lad(),
-    new Lad(),
+    new Trasher(),
 ];
 
 
