@@ -28,11 +28,18 @@ function getCreatureDescription(card) {
 }
 
 
-
+class Creature extends Card {
+    constructor(name, power) {
+        super(name, power);
+    }
+    getDescriptions() {
+        return [getCreatureDescription(this), ...super.getDescriptions()];
+    }
+}
 // Основа для утки.
-class Duck extends Card {
-    constructor() {
-        super("Утка", 2);
+class Duck extends Creature {
+    constructor(name = "Утка", power = 2) {
+        super(name, power);
     }
     quacks() { console.log('quack') };
     swims() { console.log('float: both;') };
@@ -40,12 +47,11 @@ class Duck extends Card {
 
 
 // Основа для собаки.
-class Dog extends Card {
-    constructor() {
-        super("Собака", 3);
+class Dog extends Creature {
+    constructor(name = "Собака", power = 3) {
+        super(name, power);
     }
 }
-
 
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
