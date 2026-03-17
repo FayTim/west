@@ -53,6 +53,12 @@ class Dog extends Creature {
     }
 }
 
+class Gatling extends Creature {
+    constructor(name = "Гатлинг", power = 6) {
+        super(name, power);
+    }
+}
+
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
