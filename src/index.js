@@ -5,7 +5,7 @@ import SpeedRate from './SpeedRate.js';
 
 // Отвечает является ли карта уткой.
 function isDuck(card) {
-    return card instanceof Duck;
+    return card && card.quacks && card.swims;
 }
 
 // Отвечает является ли карта собакой.
@@ -148,7 +148,18 @@ class Gatling extends Creature {
         return [...super.getDescriptions(), "Способность: При атаке наносит урон на 2 весм картам противника"];
     }
 }
+class PseudoDuck extends Dog {
+    constructor() {
+        super("Псевдоутка", 3);
+    }
+    quacks() {
+        console.log('quack')
+    };
 
+    swims() {
+        console.log('float: both;')
+    };
+}
 // Колода Шерифа, нижнего игрока.
 const seriffStartDeck = [
     new Duck(),
@@ -158,7 +169,7 @@ const seriffStartDeck = [
 
 // Колода Бандита, верхнего игрока.
 const banditStartDeck = [
-    new Lad(),
+    new PseudoDuck(),
     new Lad(),
 ];
 
